@@ -54,5 +54,4 @@ class GooglePlayMusicSearchEntryType {
 
     return types.join('%2C');
   }
-
 }

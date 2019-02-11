@@ -1,4 +1,3 @@
-
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'dart:io';
 
@@ -13,7 +12,7 @@ class GooglePlayMusicOAuthClient {
   static const String clientId = '228293309116.apps.googleusercontent.com';
   static const String secret = 'GL1YV0XMp0RlL7ylCV3ilFz-';
   static const String scope = 'https://www.googleapis.com/auth/skyjam';
-  static const String redirectEndpoint = 'urn:ietf:wg:oauth:2.0:oob';
+  static const String redirectUri = 'urn:ietf:wg:oauth:2.0:oob';
 
   static const String accessType = 'offline';
   static const String responseType = 'code';
@@ -36,7 +35,7 @@ class GooglePlayMusicOAuthClient {
    */
   Uri getAuthorizationUrl() {
     return _grant.getAuthorizationUrl(
-        Uri.parse(redirectEndpoint),
+        Uri.parse(redirectUri),
         scopes: [scope]
     );
   }
@@ -76,11 +75,4 @@ class GooglePlayMusicOAuthClient {
         secret: secret
     );
   }
-
-
-
-
-
-
-
 }

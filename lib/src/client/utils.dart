@@ -82,6 +82,4 @@ class Utils {
     RegExp exp = new RegExp('^0x[a-z0-9]*\$');
     return deviceId.length == 18 && exp.hasMatch(deviceId);
   }
-
-
 }
