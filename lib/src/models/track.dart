@@ -2,7 +2,6 @@ import 'artist_art_ref.dart';
 import 'album_art_ref.dart';
 
 class Track {
-
   String kind;
   String id;
   String clientId;

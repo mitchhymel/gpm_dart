@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:gpm_dart/src/models/models.dart';
 import 'package:gpm_dart/src/client/utils.dart';
 import 'package:gpm_dart/src/client/gpm_oauth_client.dart';
-import 'package:gpm_dart/src/client/gpm_constants.dart';
+import 'package:gpm_dart/src/client/endpoints.dart';
 
 class GooglePlayMusicClient {
 
@@ -82,20 +82,27 @@ class GooglePlayMusicClient {
     });
   }
 
+  /**
+   *
+   * Not sure on the max value for [maxTopTracks]
+   *
+   * Max value for [maxRelatedArtists] appears to be 20
+   */
   Future<Response> artist(String artistId,
-      {bool includeAlbums=true, int maxTopTracks=5, int maxRelatedArtists=5}) {
+      {bool includeAlbums=true, int maxTopTracks=5, int maxRelatedArtists=20}) {
     return _makeGetRequest(GooglePlayMusicEndpoints.ARTIST, extraParams: {
       'nid': artistId,
-      'include-albums': includeAlbums,
-      'num-top-tracks': maxTopTracks,
-      'num-related-artists': maxRelatedArtists
+      'include-albums': '$includeAlbums',
+      'num-top-tracks': '$maxTopTracks',
+      'num-related-artists': '$maxRelatedArtists'
     });
   }
 
-  Future<Response> album(String albumId, {bool includeTracks=true}) {
+  Future<Response> album(String albumId) {
     return _makeGetRequest(GooglePlayMusicEndpoints.ALBUM, extraParams: {
       'nid': albumId,
-      'include-tracks': includeTracks
+      //TODO: tracks are always included in response
+      // 'include-tracks': includeTracks.toString()
     });
   }
 
@@ -106,7 +113,7 @@ class GooglePlayMusicClient {
     return _makeGetRequest(GooglePlayMusicEndpoints.SEARCH, extraParams: {
       'q': query,
       'ct': GooglePlayMusicSearchEntryType.getSearchEntryTypeParamFromList(types),
-      'max-results': maxResults,
+      'max-results': '$maxResults',
     });
   }
 
@@ -136,29 +143,51 @@ class GooglePlayMusicClient {
     String description,
     bool isPublic=false,
   }) {
-
-    return _makePostRequest(GooglePlayMusicEndpoints.PLAYLIST_BATCH, body: {
-      'mutations': [{
-          'create': {
-            'name': name,
-            'deleted': false,
-            'creationTimestamp': '-1',
-            'lastModifiedTimestamp': '0',
-            'type': 'USER_GENERATED',
-            'shareState': isPublic ? 'PUBLIC' : 'PRIVATE',
-            'description': description
-          }
-      }]
-    });
+    return _makePostRequest(GooglePlayMusicEndpoints.PLAYLIST_BATCH,
+        body: PlaylistMutation.bodyFromMutationList([
+          new CreatePlaylistMutation(name,
+            description: description,
+            isPublic: isPublic
+          )
+        ]));
   }
 
   Future<Response> deletePlaylist(String playlistId) {
-    return _makePostRequest(GooglePlayMusicEndpoints.PLAYLIST_BATCH, body: {
-      'mutations': [{
-        'delete': playlistId
-      }]
-    });
+    return _makePostRequest(GooglePlayMusicEndpoints.PLAYLIST_BATCH,
+        body: PlaylistMutation.bodyFromMutationList([
+          new DeletePlaylistMutation(playlistId)
+        ]));
   }
+
+  /**
+   *
+   * [name], [description], [isPublic] should be left as null if you
+   * don't want to change their values
+   */
+  Future<Response> updatePlaylist(String playlistId, {
+    String name=null,
+    String description=null,
+    bool isPublic=null,
+  }) {
+    return _makePostRequest(GooglePlayMusicEndpoints.PLAYLIST_BATCH,
+      body: PlaylistMutation.bodyFromMutationList([
+        new UpdatePlaylistMutation(playlistId,
+          name: name,
+          description: description,
+          isPublic: isPublic
+        )
+      ]));
+  }
+
+  Future<Response> addToPlaylist(String playlistId, List<Track> songs) {
+    // TODO: implement
+    throw Exception('not implemented');
+    return null;
+  }
+
+//  Future<Response> removeFromPlaylist(List<PlaylistEntry> entries) {
+//    // TODO: implement
+//  }
 
 
   Future<Response> stream(String deviceId, String trackId,
@@ -208,7 +237,7 @@ class GooglePlayMusicClient {
 
 
 
-  Uri _getSkyJamUri(String endpoint, {Map extraParams}) {
+  Uri _getSkyJamUri(String endpoint, {Map<String,String> extraParams}) {
     Map<String,String> params = {
       'dv': '0',
       'alt': 'json',
@@ -227,8 +256,9 @@ class GooglePlayMusicClient {
     );
   }
 
-  Future<Response> _makeGetRequest(String endpoint, {Map extraParams}) async {
+  Future<Response> _makeGetRequest(String endpoint, {Map<String,String> extraParams}) async {
     Uri uri = _getSkyJamUri(endpoint, extraParams: extraParams);
+    print(uri.toString());
     return _client.get(uri.toString());
   }
 

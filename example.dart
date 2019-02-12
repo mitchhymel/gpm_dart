@@ -27,14 +27,24 @@ void main() async {
     print('Successful login from cached creds');
   }
 
-  Response resp = await client.library(maxResults: 10);
+  var resp = await client.createPlaylist('test from dart',
+
+  );
   print(resp.body);
 
-  IncrementalResponse<Track> lib = await client.libraryTyped(maxResults: 10);
-  lib.data.items.forEach((t) => print((t as Track).id));
+//  var resp = await client.search("Makari",
+//      maxResults: 10,
+//  );
+//  print(resp.body);
 
-  Response devices = await client.devices();
-  print(devices.body);
+//  Response resp = await client.library(maxResults: 10);
+//  print(resp.body);
+//
+//  IncrementalResponse<Track> lib = await client.libraryTyped(maxResults: 10);
+//  lib.data.items.forEach((t) => print((t as Track).id));
+
+//  Response devices = await client.devices();
+//  print(devices.body);
 
 
   print('Finish');

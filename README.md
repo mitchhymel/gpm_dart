@@ -4,12 +4,21 @@ An unofficial GooglePlayMusic client written for Dart. Based on [gmusicapi](http
 
 This project is not supported or endorsed by Google.
 
+# What works
+Tested endpoints:
+- Config
+- Devices
+- Playlist
+- Playlist Entries
+- Search
+- Album
+- Artist
+
 # TODOs
 
 Make a better readme.
 
 Add support for:
-- UpdatePlaylist
 - AddToPlaylist
 - RemoveFromPlaylist
 
