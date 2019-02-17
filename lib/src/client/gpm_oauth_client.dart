@@ -1,7 +1,8 @@
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'dart:io';
+import 'package:gpm_dart/src/client/oauth_request_client.dart';
 
-class GooglePlayMusicOAuthClient {
+class GooglePlayMusicOAuthClient extends OAuthRequestClient {
 
   static const String authorizationEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
   static const String tokenEndpoint = 'https://www.googleapis.com/oauth2/v4/token';
@@ -19,7 +20,7 @@ class GooglePlayMusicOAuthClient {
 
   final String credentialsFilePath;
   oauth2.AuthorizationCodeGrant _grant;
-  oauth2.Credentials _creds;
+  oauth2.Credentials _credentials;
 
   GooglePlayMusicOAuthClient(this.credentialsFilePath) {
     this._grant = new oauth2.AuthorizationCodeGrant(
@@ -34,6 +35,7 @@ class GooglePlayMusicOAuthClient {
    * Gets an authorization url that the user can visit and follow the steps
    * to obtain a code to login.
    */
+  @override
   Uri getAuthorizationUrl() {
     return _grant.getAuthorizationUrl(
         Uri.parse(redirectUri),
@@ -45,9 +47,10 @@ class GooglePlayMusicOAuthClient {
    * Performs OAuth login with the provided [code]. Will write the creds to
    * a [credentialsFilePath] if [saveCredentialsToFile] is set to true.
    */
+  @override
   Future<oauth2.Client> handleAuthorizationCode(String code, bool saveCredentialsToFile) async {
     oauth2.Client client = await _grant.handleAuthorizationCode(code);
-    _creds = client.credentials;
+    _credentials = client.credentials;
 
     if (saveCredentialsToFile) {
       File credsFile = new File(credentialsFilePath);
@@ -61,6 +64,7 @@ class GooglePlayMusicOAuthClient {
    * Attempts to perform OAuth login from credentials saved at
    * [credentialsFilePath].
    */
+  @override
   Future<oauth2.Client> tryLoginFromCachedCredentials() async {
     File credsFile = new File(credentialsFilePath);
     bool credsFileExists = await credsFile.exists();
@@ -71,17 +75,22 @@ class GooglePlayMusicOAuthClient {
 
     String credsFileString = await credsFile.readAsString();
     oauth2.Credentials creds = new oauth2.Credentials.fromJson(credsFileString);
-    _creds = creds;
+    _credentials = creds;
     return getClient();
   }
 
+  /**
+   * Returns an http client configured with proper auth headers to use
+   * for http requests
+   */
+  @override
   oauth2.Client getClient() {
-    if (_creds == null) {
+    if (_credentials == null) {
       return null;
     }
 
     return oauth2.Client(
-        _creds,
+        _credentials,
         identifier: clientId,
         secret: secret,
     );

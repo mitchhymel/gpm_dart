@@ -5,10 +5,11 @@ import 'package:gpm_dart/src/models/models.dart';
 import 'package:gpm_dart/src/client/utils.dart';
 import 'package:gpm_dart/src/client/gpm_oauth_client.dart';
 import 'package:gpm_dart/src/client/endpoints.dart';
+import 'package:gpm_dart/src/client/oauth_request_client.dart';
 
 class GooglePlayMusicClient {
 
-  final GooglePlayMusicOAuthClient _oauthClient;
+  final OAuthRequestClient _oauthClient;
 
   GooglePlayMusicClient._private(this._oauthClient);
 
@@ -25,13 +26,14 @@ class GooglePlayMusicClient {
 
   /**
    * Returns a [GooglePlayMusicClient] instance which will use the provided
-   * [GooglePlayMusicOAuthClient] for requests.
+   * [OAuthRequestClient] for requests.
    *
    * Only use this constructor if you need to use a custom
-   * [GooglePlayMusicOAuthClient] for some reason (e.g. mocking requests
-   * for testing).
+   * [OAuthRequestClient] for some reason (e.g. mocking requests
+   * for testing). In most cases you should use the other constructor and
+   * [GooglePlayMusicOAuthClient]
    */
-  static GooglePlayMusicClient fromOAuthClient(GooglePlayMusicOAuthClient client) {
+  static GooglePlayMusicClient fromOAuthClient(OAuthRequestClient client) {
     return new GooglePlayMusicClient._private(client);
   }
 
@@ -181,7 +183,6 @@ class GooglePlayMusicClient {
   Future<Response> addToPlaylist(String playlistId, List<Track> songs) {
     // TODO: implement
     throw Exception('not implemented');
-    return null;
   }
 
 //  Future<Response> removeFromPlaylist(List<PlaylistEntry> entries) {
