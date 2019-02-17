@@ -9,7 +9,6 @@ import 'package:gpm_dart/src/client/endpoints.dart';
 class GooglePlayMusicClient {
 
   final GooglePlayMusicOAuthClient _oauthClient;
-  Client _client;
 
   GooglePlayMusicClient._private(this._oauthClient);
 
@@ -48,22 +47,22 @@ class GooglePlayMusicClient {
    */
   Future<bool> handleAuthorizationCode(String code,
       {bool saveCredentialsToFile=false}) async {
-    _client = await this._oauthClient.handleAuthorizationCode(
+    var client = await this._oauthClient.handleAuthorizationCode(
         code,
         saveCredentialsToFile
     );
 
     // TODO: better info on login errors
 
-    return _client != null;
+    return client != null;
   }
 
   /**
    * Wrapper around this client's [_oauthClient] tryLoginFromCachedCredentials
    */
   Future<bool> tryLoginFromCachedCredentials() async {
-    _client = await this._oauthClient.tryLoginFromCachedCredentials();
-    return _client != null;
+    var client = await this._oauthClient.tryLoginFromCachedCredentials();
+    return client != null;
   }
 
 
@@ -197,6 +196,10 @@ class GooglePlayMusicClient {
       'opt': quality,
       'pt': 'e',
       'net': 'mob',
+      'dv': '0',
+      'alt': 'json',
+      'hl': 'en_US', // TODO: support other languages?
+      'tier': 'aa' // TODO: support 'aa' or 'fr'
     };
 
     if (Utils.trackIsAllAccess(trackId)) {
@@ -220,7 +223,7 @@ class GooglePlayMusicClient {
       'X-Device-ID': deviceIdToSend
     };
 
-    return _client.get(uri.toString(),
+    return _oauthClient.getClient().get(uri.toString(),
       headers: headers
     );
   }
@@ -236,6 +239,7 @@ class GooglePlayMusicClient {
   }
 
 
+  // Helpers
 
   Uri _getSkyJamUri(String endpoint, {Map<String,String> extraParams}) {
     Map<String,String> params = {
@@ -259,12 +263,12 @@ class GooglePlayMusicClient {
   Future<Response> _makeGetRequest(String endpoint, {Map<String,String> extraParams}) async {
     Uri uri = _getSkyJamUri(endpoint, extraParams: extraParams);
     print(uri.toString());
-    return _client.get(uri.toString());
+    return _oauthClient.getClient().get(uri.toString());
   }
 
   Future<Response> _makePostRequest(String endpoint, {Map body}) async {
     Uri uri = _getSkyJamUri(endpoint);
-    return _client.post(uri.toString(),
+    return _oauthClient.getClient().post(uri.toString(),
         headers: {
           'Content-Type': 'application/json'
         },

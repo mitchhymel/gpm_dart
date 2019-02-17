@@ -1,7 +1,6 @@
+import 'dart:io';
 
 import 'package:gpm_dart/gpm_dart.dart';
-import 'dart:io';
-import 'dart:async';
 import 'package:http/http.dart';
 
 void main() async {
@@ -27,10 +26,10 @@ void main() async {
     print('Successful login from cached creds');
   }
 
-  var resp = await client.createPlaylist('test from dart',
-
-  );
-  print(resp.body);
+//  var resp = await client.createPlaylist('test from dart',
+//
+//  );
+//  print(resp.body);
 
 //  var resp = await client.search("Makari",
 //      maxResults: 10,
@@ -43,9 +42,8 @@ void main() async {
 //  IncrementalResponse<Track> lib = await client.libraryTyped(maxResults: 10);
 //  lib.data.items.forEach((t) => print((t as Track).id));
 
-//  Response devices = await client.devices();
-//  print(devices.body);
-
+  Response devices = await client.devices();
+  print(devices.body);
 
   print('Finish');
 }

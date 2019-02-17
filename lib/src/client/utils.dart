@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'dart:math';
 
@@ -42,8 +43,8 @@ class Utils {
     // McStreamCall
     String s1Base64 = 'VzeC4H4h+T2f0VI180nVX8x+Mb5HiTtGnKgH52Otj8ZCGDz9jRWyHb6QXK0JskSiOgzQfwTY5xgLLSdUSreaLVMsVVWfxfa8Rw==';
     String s2Base64 = 'ZAPnhUkYwQ6y5DdQxWThbvhJHN8msQ1rqJw0ggKdufQjelrKuiGGJI30aswkgCWTDyHkTGK9ynlqTkJ5L4CiGGUabGeo8M6JTQ==';
-    List<int> s1Bytes = Utf8Encoder().convert(s1Base64);
-    List<int> s2Bytes = Utf8Encoder().convert(s2Base64);
+    Uint8List s1Bytes = base64Decode(s1Base64);
+    Uint8List s2Bytes = base64Decode(s2Base64);
 
     List<int> s1Ands2 = [];
     for (int i = 0; i < s1Bytes.length; i++) {
@@ -54,32 +55,29 @@ class Utils {
   }
 
   static String randomString(int length) {
+    String chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    String result = '';
     var rand = new Random();
-    var codeUnits = new List.generate(
-        length,
-            (index){
-          return rand.nextInt(33)+89;
-        }
-    );
+    for (int i = 0; i < length; i++) {
+      result += chars[rand.nextInt(chars.length)];
+    }
 
-    return new String.fromCharCodes(codeUnits);
+    return result;
   }
 
   static String getDeviceIdForStream(String deviceId) {
     String deviceIdToSend = deviceId;
     if (isAndroidDeviceId(deviceId)) {
-      if (deviceIdToSend.contains('0x')) {
-        deviceIdToSend = deviceIdToSend.replaceAll('0x', '');
-      }
-
-      deviceIdToSend = int.parse(deviceIdToSend, radix:16).toString();
+      deviceIdToSend = deviceIdToSend.replaceAll('0x', '');
+      deviceIdToSend = int.parse(deviceIdToSend, radix: 16).toRadixString(10);
     }
 
     return deviceIdToSend;
   }
 
   static bool isAndroidDeviceId(String deviceId) {
-    RegExp exp = new RegExp('^0x[a-z0-9]*\$');
-    return deviceId.length == 18 && exp.hasMatch(deviceId);
+//    RegExp exp = new RegExp('^0x[a-z0-9]*\$');
+//    return deviceId.length == 18 && exp.hasMatch(deviceId);
+    return deviceId.length == 18 && deviceId.contains('0x');
   }
 }

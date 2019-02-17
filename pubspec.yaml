@@ -1,15 +1,16 @@
 name: gpm_dart
-description: Dart package for an unofficial Google Play Music client
-version: 0.0.1
-author:
-homepage:
+description: A starting point for Dart libraries or applications.
+# version: 1.0.0
+# homepage: https://www.example.com
+# author: Mitchell <email@example.com>
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
   oauth2:
-  crypto:
+#dependencies:
+#  path: ^1.4.1
 
 dev_dependencies:
-
+  test: ^1.0.0

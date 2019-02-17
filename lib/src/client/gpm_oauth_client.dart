@@ -19,6 +19,7 @@ class GooglePlayMusicOAuthClient {
 
   final String credentialsFilePath;
   oauth2.AuthorizationCodeGrant _grant;
+  oauth2.Credentials _creds;
 
   GooglePlayMusicOAuthClient(this.credentialsFilePath) {
     this._grant = new oauth2.AuthorizationCodeGrant(
@@ -46,6 +47,7 @@ class GooglePlayMusicOAuthClient {
    */
   Future<oauth2.Client> handleAuthorizationCode(String code, bool saveCredentialsToFile) async {
     oauth2.Client client = await _grant.handleAuthorizationCode(code);
+    _creds = client.credentials;
 
     if (saveCredentialsToFile) {
       File credsFile = new File(credentialsFilePath);
@@ -69,10 +71,19 @@ class GooglePlayMusicOAuthClient {
 
     String credsFileString = await credsFile.readAsString();
     oauth2.Credentials creds = new oauth2.Credentials.fromJson(credsFileString);
+    _creds = creds;
+    return getClient();
+  }
+
+  oauth2.Client getClient() {
+    if (_creds == null) {
+      return null;
+    }
+
     return oauth2.Client(
-        creds,
+        _creds,
         identifier: clientId,
-        secret: secret
+        secret: secret,
     );
   }
 }
